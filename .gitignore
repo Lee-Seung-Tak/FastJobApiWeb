@@ -1,0 +1,35 @@
+# node_modules (필수)
+node_modules/
+
+# 로그 파일
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# 운영체제 관련 파일
+.DS_Store
+Thumbs.db
+
+# 환경 설정
+.env
+.env.local
+.env.*.local
+
+# Vite 캐시
+dist/
+.vite/
+
+# 에디터 관련 설정 (VSCode 등)
+.vscode/
+.idea/
+*.swp
+
+# macOS/Linux 백업 파일
+*.bak
+*.tmp
+*.log
+*~
+
+# parcel, vercel, netlify 같은 호스팅 서비스 설정파일 (선택)
+.vercel
+.netlify
