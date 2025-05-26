@@ -46,15 +46,20 @@ npm install tailwindcss @tailwindcss/vite
 ### 5. Configure the Vite plugin
 #### [ vite.config.ts ]
 ```
-import { defineConfig } from 'vite'
-import tailwindcss from '@tailwindcss/vite'
-export default defineConfig({
-  plugins: [
-    tailwindcss(),
-  ],
-})
-```
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import tailwindcss from '@tailwindcss/vite';
 
+export default defineConfig({
+  plugins: [react(), tailwindcss()],
+});
+
+```
+### 6.Tailwind CSS 초기화
+```bash
+npx tailwindcss init -p
+
+```
 ### 6. Import Tailwind CSS
 ```bash
 @import "tailwindcss";
