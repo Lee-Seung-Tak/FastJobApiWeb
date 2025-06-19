@@ -73,4 +73,7 @@ yarn dev
 
 ---
 
+### 기타 설치
 
+npm install lucide-react
+npm install axios

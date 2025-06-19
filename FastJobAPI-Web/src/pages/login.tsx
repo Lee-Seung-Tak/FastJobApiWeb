@@ -1,7 +1,8 @@
 // LoginPage.tsx
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import Header from "../components/ui/header";
 import LoginForm from "../components/ui/loginform";
+import Footer from "../components/ui/footer";
 
 interface LoginPageProps {
   setIsLoggedIn: React.Dispatch<React.SetStateAction<boolean>>;
@@ -9,6 +10,7 @@ interface LoginPageProps {
 
 export default function LoginPage({ setIsLoggedIn }: LoginPageProps) {
   const navigate = useNavigate();
+  const { section } = useParams();
 
   const handleLoginSuccess = () => {
     setIsLoggedIn(true);
@@ -24,7 +26,8 @@ export default function LoginPage({ setIsLoggedIn }: LoginPageProps) {
           setIsLoggedIn(false);
         }}
       />
-      <LoginForm onLoginSuccess={handleLoginSuccess} />
+      <LoginForm onLoginSuccess={handleLoginSuccess} initialSection={section} />
+      <Footer />
     </div>
   );
 }
