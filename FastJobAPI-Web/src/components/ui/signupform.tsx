@@ -3,7 +3,7 @@ import { ChevronDown, ChevronUp } from "lucide-react";
 import axios from 'axios';
 
 // useDebounce 훅
-function useDebounce(value: any, delay: any) {
+function useDebounce(value, delay) {
   const [debouncedValue, setDebouncedValue] = useState(value);
 
   useEffect(() => {
@@ -21,31 +21,30 @@ function useDebounce(value: any, delay: any) {
 
 // SignUp 컴포넌트 시작
 export default function SignUp() {
-  const [openSection, setOpenSection] = useState<string | null>(null);
-  // 개인회원 폼과 기업회원 폼을 위한 각각의 ref
-  const userFormRef = useRef<HTMLDivElement>(null);
-  const companyFormRef = useRef<HTMLDivElement>(null);
+  const [openSection, setOpenSection] = useState(null);
+  const userFormRef = useRef(null);
+  const companyFormRef = useRef(null);
 
-  const toggleSection = (section: string) => {
+  const toggleSection = (section) => {
     setOpenSection(openSection === section ? null : section);
   };
 
   const [formData, setFormData] = useState({
-    user: { name: '', id: '', password: '', phone: '', email: '' },
-    company: { name: '', id: '', password: '', business: '', address: '', phone: '', email: '' }
+    user: { name: '', userId: '', password: '', phone: '', email: '' }, // userId로 변경
+    company: { name: '', userId: '', password: '', business: '', address: '', phone: '', email: '' } // userId로 변경
   });
 
   const [formHints, setFormHints] = useState({
     user: {
       name: { message: '한글, 영문 대/소문자를 사용가능', color: 'text-gray-400' },
-      id: { message: "4~20자리 / 영문, 숫자, 특수문자 '_'사용가능", color: 'text-gray-400', isChecking: false },
+      userId: { message: "4~20자리 / 영문, 숫자, 특수문자 '_'사용가능", color: 'text-gray-400', isChecking: false }, // userId로 변경
       password: { message: '8-16자리 / 영문 대소문자, 숫자, 특수문자 중 2개이상 조합', color: 'text-gray-400' },
       phone: { message: '숫자만 사용가능', color: 'text-gray-400' },
       email: { message: '입력하신 이메일 주소로 인증 링크를 보내드립니다. ex) fast1234@fastjobapi.com ', color: 'text-gray-400', isChecking: false }
     },
     company: {
       name: { message: '한글, 영문 대/소문자를 사용가능', color: 'text-gray-400' },
-      id: { message: "'4~20자리 / 영문, 숫자, 특수문자 '_'사용가능", color: 'text-gray-400', isChecking: false },
+      userId: { message: "'4~20자리 / 영문, 숫자, 특수문자 '_'사용가능", color: 'text-gray-400', isChecking: false }, // userId로 변경
       password: { message: '8-16자리 / 영문 대소문자, 숫자, 특수문자 중 2개이상 조합', color: 'text-gray-400' },
       business: { message: '숫자만 사용가능 (10자리)', color: 'text-gray-400' },
       address: { message: '한글, 영문, 숫자 사용가능', color: 'text-gray-400' },
@@ -69,13 +68,13 @@ export default function SignUp() {
     },
   });
 
-  const [submissionError, setSubmissionError] = useState<string | null>(null);
-  const [submissionSuccess, setSubmissionSuccess] = useState<string | null>(null);
+  const [submissionError, setSubmissionError] = useState(null);
+  const [submissionSuccess, setSubmissionSuccess] = useState(null);
 
-  const debouncedUserId = useDebounce(formData.user.id, 500);
-  const debouncedCompanyUserId = useDebounce(formData.company.id, 500);
+  const debouncedUserId = useDebounce(formData.user.userId, 500); // formData.user.userId 참조
+  const debouncedCompanyUserId = useDebounce(formData.company.userId, 500); // formData.company.userId 참조
 
-  const areRequiredAgreed = (userType: 'user' | 'company') => {
+  const areRequiredAgreed = (userType) => {
     return (
       agreements[userType].termsOfService &&
       agreements[userType].privacyPolicy &&
@@ -83,7 +82,7 @@ export default function SignUp() {
     );
   };
 
-  const handleAgreementChange = (userType: 'user' | 'company', agreementName: string) => {
+  const handleAgreementChange = (userType, agreementName) => {
     setAgreements((prevAgreements) => ({
       ...prevAgreements,
       [userType]: {
@@ -93,7 +92,7 @@ export default function SignUp() {
     }));
   };
 
-  const checkIdAvailability = useCallback(async (userType: 'user' | 'company', idValue: string) => {
+  const checkIdAvailability = useCallback(async (userType, idValue) => {
     if (!idValue) return;
 
     const idRegex = /^[a-zA-Z0-9_]{4,20}$/;
@@ -102,7 +101,7 @@ export default function SignUp() {
         ...prevHints,
         [userType]: {
           ...prevHints[userType],
-          id: { message: '영문, 숫자, 특수문자(_) 4~20자로 입력해주세요.', color: 'text-orange-400', isChecking: false }
+          userId: { message: '영문, 숫자, 특수문자(_) 4~20자로 입력해주세요.', color: 'text-orange-400', isChecking: false }
         }
       }));
       return;
@@ -112,23 +111,23 @@ export default function SignUp() {
       ...prevHints,
       [userType]: {
         ...prevHints[userType],
-        id: { ...prevHints[userType].id, message: '중복 확인 중...', color: 'text-gray-500', isChecking: true }
+        userId: { ...prevHints[userType].userId, message: '중복 확인 중...', color: 'text-gray-500', isChecking: true }
       }
     }));
 
     try {
       const checkUrl = userType === "user"
-        ? `http://localhost:4000/api/user/check-id?userId=${idValue}`
-        : `http://localhost:4000/api/company/check-id?userId=${idValue}`;
+        ? `http://localhost:4000/api/auth/signup/userId=${idValue}`
+        : `http://localhost:4000/api/companys/signup/userId=${idValue}`;
 
-      const response = await axios.get(checkUrl);
+      const response = await axios.post(checkUrl);
 
       if (response.data.available) {
         setFormHints(prevHints => ({
           ...prevHints,
           [userType]: {
             ...prevHints[userType],
-            id: { message: '사용 가능한 아이디입니다.', color: 'text-green-500', isChecking: false }
+            userId: { message: '사용 가능한 아이디입니다.', color: 'text-green-500', isChecking: false }
           }
         }));
       } else {
@@ -136,7 +135,7 @@ export default function SignUp() {
           ...prevHints,
           [userType]: {
             ...prevHints[userType],
-            id: { message: '이미 사용 중인 아이디입니다.', color: 'text-red-500', isChecking: false }
+            userId: { message: '이미 사용 중인 아이디입니다.', color: 'text-red-500', isChecking: false }
           }
         }));
       }
@@ -146,7 +145,7 @@ export default function SignUp() {
         ...prevHints,
         [userType]: {
           ...prevHints[userType],
-          id: { message: '아이디 중복 확인 중 오류가 발생했습니다.', color: 'text-red-500', isChecking: false }
+          userId: { message: '아이디 중복 확인 중 오류가 발생했습니다.', color: 'text-red-500', isChecking: false }
         }
       }));
     }
@@ -164,8 +163,7 @@ export default function SignUp() {
     }
   }, [debouncedCompanyUserId, openSection, checkIdAvailability]);
 
-
-  const handleInputChange = (userType: 'user' | 'company', name: string, value: string) => {
+  const handleInputChange = (userType, name, value) => {
     setFormData(prevData => ({
       ...prevData,
       [userType]: {
@@ -174,15 +172,14 @@ export default function SignUp() {
       }
     }));
 
-
-    if (name === 'id') {
+    if (name === 'userId') { // userId로 변경
       const idRegex = /^[a-zA-Z0-9_]{4,20}$/;
       if (value.length === 0) {
         setFormHints(prevHints => ({
           ...prevHints,
           [userType]: {
             ...prevHints[userType],
-            id: { message: '4~20자리 / 영문, 숫자, 특수문자 \'_\'사용가능', color: 'text-gray-400', isChecking: false }
+            userId: { message: '4~20자리 / 영문, 숫자, 특수문자 \'_\'사용가능', color: 'text-gray-400', isChecking: false } // userId로 변경
           }
         }));
       } else if (!idRegex.test(value)) {
@@ -190,7 +187,7 @@ export default function SignUp() {
           ...prevHints,
           [userType]: {
             ...prevHints[userType],
-            id: { message: '영문, 숫자, 특수문자(_) 4~20자로 입력해주세요.', color: 'text-orange-400', isChecking: false }
+            userId: { message: '영문, 숫자, 특수문자(_) 4~20자로 입력해주세요.', color: 'text-orange-400', isChecking: false } // userId로 변경
           }
         }));
       } else {
@@ -198,7 +195,7 @@ export default function SignUp() {
           ...prevHints,
           [userType]: {
             ...prevHints[userType],
-            id: { message: '형식에 맞습니다. 중복 확인 중...', color: 'text-gray-400', isChecking: true }
+            userId: { message: '형식에 맞습니다. 중복 확인 중...', color: 'text-gray-400', isChecking: true } // userId로 변경
           }
         }));
       }
@@ -206,7 +203,7 @@ export default function SignUp() {
   };
 
   // 입력 필드에서 포커스가 벗어났을 때 (onBlur) 유효성 검사 및 힌트 업데이트
-  const handleInputBlur = (userType: 'user' | 'company', e: React.FocusEvent<HTMLInputElement>) => {
+  const handleInputBlur = (userType, e) => {
     const { name, value } = e.target;
     let message = '';
     let color = 'text-gray-400';
@@ -226,8 +223,8 @@ export default function SignUp() {
           color = 'text-green-500';
         }
         break;
-      case 'user-id':
-      case 'company-id':
+      case 'user-userId': // userId로 변경
+      case 'company-userId': // userId로 변경
         const idRegex = /^[a-zA-Z0-9_]{4,20}$/;
         if (value.length === 0) {
           message = '4~20자리 / 영문, 숫자, 특수문자 \'_\'사용가능';
@@ -236,7 +233,6 @@ export default function SignUp() {
           message = '영문, 숫자, 특수문자(_) 4~20자로 입력해주세요.';
           color = 'text-orange-400';
         } else {
-          // ID 필드는 onBlur 시에도 유효성 검사 및 중복 확인 트리거
           message = '형식에 맞습니다. 중복 확인 중...';
           color = 'text-gray-400';
           isChecking = true;
@@ -318,7 +314,7 @@ export default function SignUp() {
       ...prevHints,
       [userType]: {
         ...prevHints[userType],
-        [name]: { message, color, isChecking: name === 'id' ? isChecking : false }
+        [name]: { message, color, isChecking: name === 'userId' ? isChecking : false } // userId로 변경
       }
     }));
   };
@@ -341,12 +337,12 @@ export default function SignUp() {
       setIsComposing(true);
     };
 
-    const handleCompositionEnd = (e: React.CompositionEvent<HTMLInputElement>) => {
+    const handleCompositionEnd = (e) => {
       setIsComposing(false);
       handleInputChange(userType, name, e.currentTarget.value);
     };
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleChange = (e) => {
       const newValue = e.target.value;
       setLocalValue(newValue);
 
@@ -358,12 +354,12 @@ export default function SignUp() {
     return (
       <div className="flex flex-col mb-4">
         <div className="flex items-center space-x-6">
-          <label htmlFor={name} className="text-white font-mono w-24">
+          <label htmlFor={uniqueId} className="text-white font-mono w-24">
             <span className="text-red-500 mr-1">*</span>{displayLabel}
           </label>
           <input
             id={uniqueId}
-            name={name}
+            name={name} // 이 name 속성이 formData의 키와 일치해야 합니다 (userId, password 등)
             type={name.includes('password') ? 'password' : 'text'}
             placeholder={displayPlaceholder}
             value={isComposing ? localValue : value}
@@ -377,7 +373,7 @@ export default function SignUp() {
         {hint && hint.message && (
           <p className={`${hint.color} text-sm mt-1 ml-30`}>
             {hint.message}
-            {name === 'id' && hint.isChecking && (
+            {name === 'userId' && hint.isChecking && ( // userId로 변경
               <span className="ml-2 text-gray-500"> (확인 중...)</span>
             )}
           </p>
@@ -386,14 +382,14 @@ export default function SignUp() {
     );
   };
 
-  const SignUpForm = ({ userType }: { userType: 'user' | 'company' }) => {
+  const SignUpForm = ({ userType }) => {
     const validateForm = () => {
       const currentData = formData[userType];
       const allFieldsFilledAndValid = Object.keys(currentData).every(fieldName => {
         const value = currentData[fieldName];
         const hint = formHints[userType][fieldName];
 
-        if (fieldName === 'id') {
+        if (fieldName === 'userId') { // userId로 변경
           return value && hint && hint.color === 'text-green-500' && hint.message === '사용 가능한 아이디입니다.' && !hint.isChecking;
         }
         return value && hint && hint.color === 'text-green-500';
@@ -402,7 +398,7 @@ export default function SignUp() {
       return allFieldsFilledAndValid;
     };
 
-    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (e) => {
       e.preventDefault();
 
       setSubmissionError(null);
@@ -415,7 +411,8 @@ export default function SignUp() {
 
       const currentFormData = formData[userType];
       Object.keys(currentFormData).forEach(fieldName => {
-        const syntheticEvent = { target: { name: fieldName, value: currentFormData[fieldName] } } as React.FocusEvent<HTMLInputElement>;
+        // FormInput 컴포넌트의 name prop과 일치하도록 name: fieldName으로 설정
+        const syntheticEvent = { target: { name: fieldName, value: currentFormData[fieldName] } };
         handleInputBlur(userType, syntheticEvent);
       });
 
@@ -428,7 +425,7 @@ export default function SignUp() {
       if (userType === "user") {
         payload = {
           name: currentFormData.name,
-          userId: currentFormData.id,
+          userId: currentFormData.userId, // userId로 변경
           password: currentFormData.password,
           phone: currentFormData.phone,
           email: currentFormData.email,
@@ -436,7 +433,7 @@ export default function SignUp() {
       } else {
         payload = {
           companyName: currentFormData.name,
-          userId: currentFormData.id,
+          userId: currentFormData.userId, // userId로 변경
           password: currentFormData.password,
           businessNumber: currentFormData.business,
           address: currentFormData.address,
@@ -468,20 +465,20 @@ export default function SignUp() {
             {userType === "company" ? (
               <>
                 <FormInput name="name" label="name" placeholder="회사명" userType={userType} />
-                <FormInput name="id" label="id" placeholder="로그인용 회사 ID" userType={userType} />
-                <FormInput name="password" label="password" placeholder="비밀번호" userType={userType} />
-                <FormInput name="business" label="business" placeholder="사업자등록번호" userType={userType} />
-                <FormInput name="address" label="address" placeholder="회사주소" userType={userType} />
-                <FormInput name="phone" label="phone" placeholder="회사 연락처" userType={userType} />
-                <FormInput name="email" label="email" placeholder="입력하신 이메일 주소로 인증 링크를 보내드립니다." userType={userType} />
+                <FormInput name="userId" label="아이디" placeholder="로그인용 회사 ID" userType={userType} /> {/* name을 userId로 변경, label도 '아이디'로 직관적으로 변경 */}
+                <FormInput name="password" label="비밀번호" placeholder="비밀번호" userType={userType} />
+                <FormInput name="business" label="사업자등록번호" placeholder="사업자등록번호" userType={userType} />
+                <FormInput name="address" label="회사주소" placeholder="회사주소" userType={userType} />
+                <FormInput name="phone" label="회사 연락처" placeholder="회사 연락처" userType={userType} />
+                <FormInput name="email" label="이메일" placeholder="입력하신 이메일 주소로 인증 링크를 보내드립니다." userType={userType} />
               </>
             ) : (
               <>
-                <FormInput name="name" label="name" placeholder="이름" userType={userType} />
-                <FormInput name="id" label="id" placeholder="아이디" userType={userType} />
-                <FormInput name="password" label="password" placeholder="비밀번호" userType={userType} />
-                <FormInput name="phone" label="phone" placeholder="연락처" userType={userType} />
-                <FormInput name="email" label="email" placeholder="이메일" userType={userType} />
+                <FormInput name="name" label="이름" placeholder="이름" userType={userType} />
+                <FormInput name="userId" label="아이디" placeholder="아이디" userType={userType} /> {/* name을 userId로 변경, label도 '아이디'로 직관적으로 변경 */}
+                <FormInput name="password" label="비밀번호" placeholder="비밀번호" userType={userType} />
+                <FormInput name="phone" label="연락처" placeholder="연락처" userType={userType} />
+                <FormInput name="email" label="이메일" placeholder="이메일" userType={userType} />
               </>
             )}
           </div>
@@ -590,7 +587,6 @@ export default function SignUp() {
             overflow: 'hidden'
           }}
         >
-          {/* {openSection === "user" && <SignUpForm userType="user" />} */}
           <SignUpForm userType="user" />
         </div>
       </div>
@@ -623,7 +619,6 @@ export default function SignUp() {
             overflow: 'hidden'
           }}
         >
-          {/* {openSection === "company" && <SignUpForm userType="company" />} */}
           <SignUpForm userType="company" />
         </div>
       </div>

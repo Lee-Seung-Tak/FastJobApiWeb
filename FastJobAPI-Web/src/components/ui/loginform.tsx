@@ -95,7 +95,7 @@ export default function LoginPage({ setIsLoggedIn, setRole, initialSection, onCl
     setCurrentErrorMessage(null);
 
     try {
-      const apiUrl = data.userType === "user" ? "http://localhost:4000/api/auth/login" : "http://localhost:4000/api/companys/login";
+      const apiUrl = data.userType === "user" ? "http://localhost:4000/auth/login" : "http://localhost:4000/companys/login";
       const response = await axios.post(apiUrl, {
         id: data.id,
         password: data.password,
