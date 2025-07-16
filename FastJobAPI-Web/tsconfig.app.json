@@ -27,6 +27,7 @@
   },
   "include": [
     "src",
-    "src/components/ui/.tsx"
+    "src/components/ui/.tsx",
+    "src/styles/global.d.ts"
   ]
 }

@@ -1,33 +1,25 @@
-// LoginPage.tsx
-import { useNavigate, useParams } from "react-router-dom";
-import Header from "../components/ui/header";
-import LoginForm from "../components/ui/loginform";
-import Footer from "../components/ui/footer";
+import React from 'react';
+// import Header from '../components/layout/Header';
+import LoginForm from '../components/loginForm';
 
-interface LoginPageProps {
-  setIsLoggedIn: React.Dispatch<React.SetStateAction<boolean>>;
-}
-
-export default function LoginPage({ setIsLoggedIn }: LoginPageProps) {
-  const navigate = useNavigate();
-  const { section } = useParams();
-
-  const handleLoginSuccess = () => {
-    setIsLoggedIn(true);
-    navigate("/");
-  };
+const Login: React.FC = () => {
+  // const [loginOpen, setLoginOpen] = React.useState(true);
+  // const [signupOpen, setSignupOpen] = React.useState(false);
 
   return (
-    <div>
-      <Header
-        isLoggedIn={false} // 로그인 페이지는 항상 비로그인 상태로 간주해도 됨
-        onLogout={() => {
-          localStorage.removeItem("access_token");
-          setIsLoggedIn(false);
-        }}
-      />
-      <LoginForm onLoginSuccess={handleLoginSuccess} initialSection={section} />
-      <Footer />
+    <div className="min-h-screen bg-[#0f0f11]">
+      {/* Header
+      <Header /> */}
+      {/* Authentication Panels */}
+      <section className="mx-auto space-y-2 ">
+        <LoginForm setIsLoggedIn={function (_value: React.SetStateAction<boolean>): void {
+          throw new Error('Function not implemented.');
+        }} setUserType={function (_value: React.SetStateAction<'user' | 'company' | null>): void {
+          throw new Error('Function not implemented.');
+        }} />
+      </section>
     </div>
   );
-}
+};
+
+export default Login;
