@@ -1,6 +1,5 @@
-// src/App.tsx
 import { useState } from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Main from './pages/Main';
 import Header from './components/layout/Header';
 import LoginForm from './components/loginForm';
@@ -10,8 +9,8 @@ import CompanyHome from './pages/company/CompanyHome';
 import './styles/global.css';
 
 function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(() =>
-    Boolean(localStorage.getItem('access_token'))
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(
+    () => Boolean(localStorage.getItem('access_token'))
   );
 
   const [userType, setUserType] = useState<'user' | 'company' | null>(
@@ -28,27 +27,81 @@ function App() {
           localStorage.removeItem('userType');
           setIsLoggedIn(false);
           setUserType(null);
-        }} />
+        }}
+      />
+
       <Routes>
+        {/* Public home, redirected if logged in */}
         <Route
           path="/"
-          element={<Main setIsLoggedIn={setIsLoggedIn} setUserType={setUserType} />}
+          element={
+            !isLoggedIn ? (
+              <Main setIsLoggedIn={setIsLoggedIn} setUserType={setUserType} />
+            ) : (
+              <Navigate
+                to={userType === 'company' ? '/company/home' : '/user/home'}
+                replace
+              />
+            )
+          }
         />
+
+        {/* Login and Signup, only for logged-out users */}
         <Route
           path="/login"
-          element={<LoginForm setIsLoggedIn={setIsLoggedIn} setUserType={setUserType} />}
+          element={
+            !isLoggedIn ? (
+              <LoginForm setIsLoggedIn={setIsLoggedIn} setUserType={setUserType} />
+            ) : (
+              <Navigate
+                to={userType === 'company' ? '/company/home' : '/user/home'}
+                replace
+              />
+            )
+          }
         />
         <Route
           path="/signup"
-          element={<SignupForm setIsLoggedIn={setIsLoggedIn} setUserType={setUserType} />}
+          element={
+            !isLoggedIn ? (
+              <SignupForm setIsLoggedIn={setIsLoggedIn} setUserType={setUserType} />
+            ) : (
+              <Navigate
+                to={userType === 'company' ? '/company/home' : '/user/home'}
+                replace
+              />
+            )
+          }
         />
+
+        {/* Protected routes */}
         <Route
           path="/user/home"
-          element={<UserHome isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} />}
+          element={
+            isLoggedIn && userType === 'user' ? (
+              <UserHome
+                isLoggedIn={isLoggedIn}
+                setIsLoggedIn={setIsLoggedIn}
+
+              />
+            ) : (
+              <Navigate to="/" replace />
+            )
+          }
         />
         <Route
           path="/company/home"
-          element={<CompanyHome isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} />}
+          element={
+            isLoggedIn && userType === 'company' ? (
+              <CompanyHome
+                isLoggedIn={isLoggedIn}
+                setIsLoggedIn={setIsLoggedIn}
+
+              />
+            ) : (
+              <Navigate to="/" replace />
+            )
+          }
         />
       </Routes>
     </BrowserRouter>
