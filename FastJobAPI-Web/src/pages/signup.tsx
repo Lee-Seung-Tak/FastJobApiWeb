@@ -18,6 +18,8 @@ function Toast({ message, onClose }: { message: string; onClose: () => void }) {
 }
 
 interface SignUpFormProps {
+  isLoggedIn: boolean;
+  setIsLoggedIn: React.Dispatch<React.SetStateAction<boolean>>;
   onSignUpSuccess: () => void;
 }
 
