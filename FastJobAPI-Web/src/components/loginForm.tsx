@@ -103,6 +103,34 @@ const LoginForm: FC<LoginFormProps> = ({ setIsLoggedIn, setUserType }) => {
         <Input id="ind-pw" type="password" placeholder="비밀번호" ref={indPasswordRef} />
       </div>
       {error && <div className="text-red-500 text-xs">{error}</div>}
+
+      {/* 아이디/비번 찾기 & 회원가입 링크 */}
+      <div className="flex justify-center items-center text-xs text-[#7a7a82] space-x-2">
+        <button
+          type="button"
+          onClick={() => navigate('/user/find-id')}
+          className="hover:underline"
+        >
+          아이디 찾기
+        </button>
+        <span>|</span>
+        <button
+          type="button"
+          onClick={() => navigate('/user/find-password')}
+          className="hover:underline"
+        >
+          비밀번호 찾기
+        </button>
+        <span>|</span>
+        <button
+          type="button"
+          onClick={() => navigate('/signup')}
+          className="text-[#2077ff] hover:underline"
+        >
+          회원가입
+        </button>
+      </div>
+
       <Button variant="primary" type="submit" disabled={loading}>
         {loading ? '로그인 중...' : '로그인'}
       </Button>
@@ -135,6 +163,34 @@ const LoginForm: FC<LoginFormProps> = ({ setIsLoggedIn, setUserType }) => {
         <Input id="comp-pw" type="password" placeholder="비밀번호" ref={compPasswordRef} />
       </div>
       {error && <div className="text-red-500 text-xs">{error}</div>}
+
+      {/* 아이디/비번 찾기 & 회원가입 링크 */}
+      <div className="flex justify-center items-center text-xs text-[#7a7a82] space-x-2">
+        <button
+          type="button"
+          onClick={() => navigate('/company/find-id')}
+          className="hover:underline"
+        >
+          아이디 찾기
+        </button>
+        <span>|</span>
+        <button
+          type="button"
+          onClick={() => navigate('/company/find-password')}
+          className="hover:underline"
+        >
+          비밀번호 찾기
+        </button>
+        <span>|</span>
+        <button
+          type="button"
+          onClick={() => navigate('/signup')}
+          className="text-[#00b14f] hover:underline"
+        >
+          회원가입
+        </button>
+      </div>
+
       <Button variant="secondary" type="submit" disabled={loading}>
         {loading ? '로그인 중...' : '로그인'}
       </Button>

@@ -1,3 +1,4 @@
+// src/pages/SignupForm.tsx
 import React, { type FC, useState, type FormEvent } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import axios from 'axios';
@@ -10,7 +11,7 @@ interface SignupFormProps {
   setUserType: React.Dispatch<React.SetStateAction<'user' | 'company' | null>>;
 }
 
-const SignupForm: FC<SignupFormProps> = ({ setIsLoggedIn, setUserType }) => {
+const SignupForm: FC<SignupFormProps> = () => {
   const navigate = useNavigate();
   const [indOpen, setIndOpen] = useState(false);
   const [compOpen, setCompOpen] = useState(false);
@@ -33,15 +34,10 @@ const SignupForm: FC<SignupFormProps> = ({ setIsLoggedIn, setUserType }) => {
         { headers: { 'Content-Type': 'multipart/form-data' } }
       );
       console.log('개인회원 가입 성공:', res.data);
-      // 로그인 상태 올리기
-      setIsLoggedIn(true);
-      // 토큰 저장 (응답 필드에 맞춰 변경)
-      localStorage.setItem('access_token', res.data.access_token);
-      // 유저 타입 저장
-      localStorage.setItem('userType', 'user');
-      setUserType('user');
-      // 개인회원 홈으로 이동
-      navigate('/user/home');
+
+      // 이메일 인증 페이지로 이동 (email 필드만 전달)
+      const email = formData.get('email') as string;
+      navigate('/verify-email', { state: { email } });
     } catch (err: any) {
       console.error(err);
       setIndError(err.response?.data?.message || '가입 중 오류가 발생했습니다.');
@@ -65,15 +61,10 @@ const SignupForm: FC<SignupFormProps> = ({ setIsLoggedIn, setUserType }) => {
         { headers: { 'Content-Type': 'multipart/form-data' } }
       );
       console.log('기업회원 가입 성공:', res.data);
-      // 로그인 상태 올리기
-      setIsLoggedIn(true);
-      // 토큰 저장 (응답 필드에 맞춰 변경)
-      localStorage.setItem('access_token', res.data.access_token);
-      // 유저 타입 저장
-      localStorage.setItem('userType', 'company');
-      setUserType('company');
-      // 기업회원 홈으로 이동
-      navigate('/company/home');
+
+      // 이메일 인증 페이지로 이동
+      const email = formData.get('email') as string;
+      navigate('/verify-email', { state: { email } });
     } catch (err: any) {
       console.error(err);
       setCompError(err.response?.data?.message || '가입 중 오류가 발생했습니다.');
@@ -128,8 +119,7 @@ const SignupForm: FC<SignupFormProps> = ({ setIsLoggedIn, setUserType }) => {
             <CompanySignupForm
               onSubmit={submitCompany}
               loading={loading}
-              error={compError}
-            />
+              error={compError} />
           </div>
         )}
       </div>

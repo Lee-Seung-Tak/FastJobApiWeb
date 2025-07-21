@@ -17,12 +17,12 @@ const CompanySignupForm: React.FC<Props> = ({ onSubmit, loading, error }) => (
       </label>
       <Input name="name" placeholder="회사명" />
     </div>
-    {/* userId */}
+    {/* companyId */}
     <div>
       <label className="block text-xs">
-        <span className="text-white">userId</span><span className="text-red-500 ml-1">*required</span>
+        <span className="text-white">companyId</span><span className="text-red-500 ml-1">*required</span>
       </label>
-      <Input name="userId" placeholder="4~20자 / 영문, 숫자, '-' 가능" />
+      <Input name="companyId" placeholder="4~20자 / 영문, 숫자, '-' 가능" />
     </div>
     {/* password */}
     <div>
@@ -31,12 +31,24 @@ const CompanySignupForm: React.FC<Props> = ({ onSubmit, loading, error }) => (
       </label>
       <Input name="password" type="password" placeholder="비밀번호" />
     </div>
-    {/* business */}
+    {/* 사업 분야 ID */}
     <div>
-      <label className="block text-xs">
-        <span className="text-white">business</span><span className="text-red-500 ml-1">*required</span>
+      <label htmlFor="business" className="block text-xs text-[#7a7a82] mb-1">
+        business<span className="text-red-500 ml-1">*required</span>
       </label>
-      <Input name="business" placeholder="사업자등록번호(숫자만 10자리)" />
+      <select
+        id="business"
+        name="business"
+        className="w-full bg-[#1e1e1e] text-white border border-[#3a3a3d] rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2077ff]"
+        defaultValue=""
+      >
+        <option value="" disabled>
+          사업 분야 선택
+        </option>
+        <option value="1">SI</option>
+        <option value="2">임베디드</option>
+        <option value="3">LLM</option>
+      </select>
     </div>
     {/* address */}
     <div>
