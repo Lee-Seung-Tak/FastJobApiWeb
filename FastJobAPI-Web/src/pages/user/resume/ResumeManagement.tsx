@@ -5,7 +5,7 @@ import ResumeUpload from './ResumeUpload';
 import ResumeViewEdit from './ResumeViewEdit';
 
 const ResumeManagement: React.FC = () => {
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(false);
   const [currentTab, setCurrentTab] = useState<'upload' | 'manage'>('upload');
   const contentRef = useRef<HTMLDivElement>(null);
 

@@ -1,5 +1,12 @@
-// src/pages/UserHome.tsx
+// src/pages/CompanyHome.tsx
 import React, { type FC } from 'react';
+import CompanyOverview from './CompanyOverview';
+import JobPostings from './JobPostings';
+import AiTalentMatch from './AiTalentMatch';
+import TalentPool from './TalentPool';
+import RecruitmentProcess from './RecruitmentProcess';
+import SavedTalents from './SavedTalents';
+import CompanyProfile from './CompanyProfile';
 
 export interface UserHomeProps {
   isLoggedIn: boolean;
@@ -16,6 +23,13 @@ const UserHome: FC<UserHomeProps> = () => {
             기업회원
           </h3>
         </section>
+        <CompanyOverview />
+        <JobPostings />
+        <AiTalentMatch />
+        <TalentPool />
+        <RecruitmentProcess />
+        <SavedTalents />
+        <CompanyProfile />
       </main>
     </>
   );

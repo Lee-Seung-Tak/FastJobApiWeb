@@ -1,6 +1,13 @@
 // src/pages/UserHome.tsx
 import React, { type FC } from 'react';
 import ResumeManagement from './resume/ResumeManagement';
+import AiCompanyMatch from './AiCompanyMatch';
+import JobListings from './JobListings';
+import ApplicationHistory from './ApplicationHistory';
+import OffersReceived from './OffersReceived';
+import SavedCompanies from './SavedCompanies';
+import MyProfile from './MyProfile';
+
 
 export interface UserHomeProps {
   isLoggedIn: boolean;
@@ -19,6 +26,12 @@ const UserHome: FC<UserHomeProps> = () => {
           </h3>
         </section>
         <ResumeManagement />
+        <AiCompanyMatch />
+        <JobListings />
+        <ApplicationHistory />
+        <OffersReceived />
+        <SavedCompanies />
+        <MyProfile />
       </main>
     </>
   );

@@ -1,17 +1,29 @@
-import { useState } from 'react';
+import { useState, type SetStateAction } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import './styles/global.css';
+
 import Main from './pages/Main';
 import Header from './components/layout/Header';
+
+// Login
 import LoginForm from './components/loginForm';
 import UserFindId from './pages/user/FindId';
 import UserFindPassword from './pages/user/FindPassword';
 import CompanyFindId from './pages/company/FindId';
 import CompanyFindPassword from './pages/company/FindPassword';
+
+// Signup
 import SignupForm from './components/signupForm';
 import VerifyEmail from './pages/VerifyEmail';
+
+// User home
 import UserHome from './pages/user/UserHome';
+
+// Company home
 import CompanyHome from './pages/company/CompanyHome';
-import './styles/global.css';
+import NewJobPosting from './pages/company/resume/NewJobPosting';
+
+
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(
@@ -104,6 +116,17 @@ function App() {
             )
           }
         />
+
+
+        <Route
+          path="/company/home"
+          element=
+          {<CompanyHome isLoggedIn={false} setIsLoggedIn={function (_value: SetStateAction<boolean>): void {
+            throw new Error('Function not implemented.');
+          }} />} />
+
+
+        {/* 
         <Route
           path="/company/home"
           element={
@@ -117,9 +140,12 @@ function App() {
               <Navigate to="/" replace />
             )
           }
-        />
+        /> */}
+
+        <Route path="/company/job-postings/new" element={<NewJobPosting />} />
+
       </Routes>
-    </BrowserRouter>
+    </BrowserRouter >
   );
 }
 
