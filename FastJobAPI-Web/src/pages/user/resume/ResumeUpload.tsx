@@ -1,5 +1,5 @@
 // src/components/ui/userhome/ResumeUpload.tsx
-// 개인회원 - 이력서 관리 - 이력서 업로드
+// 개인회원 - 이력서 관리 - 이력서 업로드 (텍스트 입력 제거 버전)
 import { useState } from "react";
 
 type DocKey = "resume" | "career" | "selfIntro" | "portfolio";
@@ -8,26 +8,30 @@ type UploadState = "idle" | "loading" | "success" | "error";
 
 const API_URL = "http://localhost:4000/users/user/application-docs";
 
-const ResumeUpload = () => {
-  // ── 기존 기술스택 로직 유지 ───────────────────────────────
-  const [techStackInput, setTechStackInput] = useState<string>("");
-  const [techStacks, setTechStacks] = useState<string[]>([
-    "Front-end",
-    "Python",
-    "HTML",
-    "CSS",
-    "React",
-    "JavaScript",
-  ]);
+type Props = {
+  /** 업로드 성공 후 부모에서 탭 전환 등에 사용 (선택) */
+  onUploaded?: () => void;
+};
 
-  const handleAddTechStack = () => {
-    if (techStackInput.trim() && !techStacks.includes(techStackInput.trim())) {
-      setTechStacks((s) => [...s, techStackInput.trim()]);
-      setTechStackInput("");
-    }
-  };
-  const handleRemoveTechStack = (t: string) =>
-    setTechStacks((s) => s.filter((x) => x !== t));
+const ResumeUpload: React.FC<Props> = ({ onUploaded }) => {
+  // ── 기술스택 UI(전송은 안 함, 필요 시 별도 API로 확장) ──────────
+  // const [techStackInput, setTechStackInput] = useState<string>("");
+  // const [techStacks, setTechStacks] = useState<string[]>([
+  //   "Front-end",
+  //   "Python",
+  //   "HTML",
+  //   "CSS",
+  //   "React",
+  //   "JavaScript",
+  // ]);
+  // const handleAddTechStack = () => {
+  //   if (techStackInput.trim() && !techStacks.includes(techStackInput.trim())) {
+  //     setTechStacks((s) => [...s, techStackInput.trim()]);
+  //     setTechStackInput("");
+  //   }
+  // };
+  // const handleRemoveTechStack = (t: string) =>
+  //   setTechStacks((s) => s.filter((x) => x !== t));
 
   // ── 업로드/URL 모드 & 파일/URL 상태 ──────────────────────
   const [mode, setMode] = useState<Record<DocKey, Mode>>({
@@ -49,15 +53,11 @@ const ResumeUpload = () => {
     portfolio: "",
   });
 
-  // ── 엔드포인트 스펙용 텍스트 필드 ─────────────────────────
-  const [resumeText, setResumeText] = useState("");
-  const [selfIntroText, setSelfIntroText] = useState("");
-  const [careerDescText, setCareerDescText] = useState("");
-
   // ── 상태/토큰 ─────────────────────────────────────────────
   const [status, setStatus] = useState<UploadState>("idle");
   const [msg, setMsg] = useState("");
-  const token = (typeof window !== "undefined" && localStorage.getItem("access_token")) || "";
+  const token =
+    (typeof window !== "undefined" && localStorage.getItem("access_token")) || "";
 
   // ── 제출(엔드포인트 호출) ─────────────────────────────────
   const handleSubmit = async (e: React.FormEvent) => {
@@ -68,18 +68,14 @@ const ResumeUpload = () => {
     try {
       if (!token) throw new Error("로그인이 필요합니다. access_token 이 없습니다.");
 
-      // 이력서 파일은 업로드 필수(프로덕트 정책 기준)
+      // 이력서 파일은 업로드 필수
       if (mode.resume === "upload" && !files.resume) {
         throw new Error("이력서 PDF를 선택해 주세요.");
       }
 
       const form = new FormData();
-      // 텍스트 필드(비워도 서버가 허용한다면 그대로 전송)
-      form.append("resumeText", resumeText);
-      form.append("selfIntroText", selfIntroText);
-      form.append("careerDescText", careerDescText);
 
-      // 파일 필드: 선택된 경우만 첨부
+      // 파일 필드: 선택된 경우만 첨부 (텍스트 필드 전송 X)
       if (mode.resume === "upload" && files.resume)
         form.append("resumeFile", files.resume, files.resume.name);
       if (mode.selfIntro === "upload" && files.selfIntro)
@@ -88,14 +84,13 @@ const ResumeUpload = () => {
         form.append("careerDescFile", files.career, files.career.name);
 
       // 포트폴리오/URL/스택은 현재 엔드포인트 스펙에 없음 → 전송 제외
-      // TODO: 별도 API 확정되면 여기서 함께 FormData/JSON 구성
 
       const res = await fetch(API_URL, {
         method: "PATCH",
         headers: {
           Accept: "application/json",
           Authorization: `Bearer ${token}`,
-          // ⚠️ Content-Type 수동 지정 금지 (FormData boundary 자동)
+          // ⚠️ Content-Type 지정 금지(FormData boundary 자동)
         },
         body: form,
       });
@@ -105,12 +100,22 @@ const ResumeUpload = () => {
 
       if (!res.ok) {
         throw new Error(
-          typeof data === "string" ? data : data?.message || `업로드 실패 (${res.status})`
+          typeof data === "string"
+            ? data
+            : data?.message || `업로드 실패 (${res.status})`
         );
       }
 
       setStatus("success");
-      setMsg(typeof data === "string" ? data : data?.message || "업로드 성공!");
+      setMsg(
+        typeof data === "string" ? data : data?.message || "업로드 성공! AI 분석을 시작합니다."
+      );
+
+      // 폼 초기화
+      setFiles({ resume: null, career: null, selfIntro: null, portfolio: null });
+
+      // 부모에게 알림(예: 탭을 '이력서 확인/수정'으로 전환)
+      onUploaded?.();
     } catch (err: any) {
       setStatus("error");
       setMsg(err?.message || "업로드 중 오류가 발생했습니다.");
@@ -127,13 +132,12 @@ const ResumeUpload = () => {
     }
     const url = URL.createObjectURL(f);
     window.open(url, "_blank", "noopener,noreferrer");
-    // 메모리 해제는 창이 닫히면 브라우저가 정리함. 필요 시 setTimeout으로 revoke 가능.
   };
 
   const DOCS: { key: DocKey; label: string; required: boolean }[] = [
     { key: "resume", label: "이력서", required: true },
-    { key: "career", label: "경력기술서", required: true },
-    { key: "selfIntro", label: "자기소개서", required: true },
+    { key: "career", label: "경력기술서", required: false },
+    { key: "selfIntro", label: "자기소개서", required: false },
     { key: "portfolio", label: "포트폴리오", required: false },
   ];
 
@@ -148,7 +152,7 @@ const ResumeUpload = () => {
           </label>
 
           {/* 파일/URL 스위치 */}
-          <div className="flex space-x-4 pt-2">
+          {/* <div className="flex space-x-4 pt-2">
             <div className="flex items-center space-x-2">
               <input
                 type="radio"
@@ -173,21 +177,18 @@ const ResumeUpload = () => {
                 value="github"
                 checked={mode[doc.key] === "github"}
                 onChange={() => setMode((m) => ({ ...m, [doc.key]: "github" }))}
-                // 현재 API는 파일만 처리 → 포트폴리오만 URL 허용, 나머지는 비활성화
-                disabled={doc.key !== "portfolio"}
+                disabled={doc.key !== "portfolio"} // 현재 API 미지원
                 className="appearance-none h-4 w-4 rounded-full border border-gray-400 checked:bg-blue-500 checked:border-blue-500
                            focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-40"
               />
               <label htmlFor={`${doc.key}-github`} className="text-sm">
                 GitHub URL
                 {doc.key !== "portfolio" && (
-                  <span className="ml-1 text-xs text-gray-400">
-                    (현재 이 항목은 미지원)
-                  </span>
+                  <span className="ml-1 text-xs text-gray-400">(현재 미지원)</span>
                 )}
               </label>
             </div>
-          </div>
+          </div> */}
 
           {/* 값 입력 영역 */}
           {mode[doc.key] === "upload" ? (
@@ -196,12 +197,15 @@ const ResumeUpload = () => {
                 type="file"
                 accept="application/pdf"
                 onChange={(e) =>
-                  setFiles((f) => ({ ...f, [doc.key]: e.target.files?.[0] ?? null }))
+                  setFiles((f) => ({
+                    ...f,
+                    [doc.key]: e.target.files?.[0] ?? null,
+                  }))
                 }
                 className="flex-grow h-10 w-full rounded-md border border-gray-600 bg-[#1f1f1f] px-3 py-2 text-sm text-gray-300
                            focus:outline-none focus:ring-2 focus:ring-blue-500 file:border-0 file:bg-transparent
                            file:text-sm file:font-medium file:text-gray-300"
-                required={doc.key === "resume"} // 이력서만 강제
+                required={doc.key === "resume"} // 이력서만 필수
               />
             </div>
           ) : (
@@ -220,43 +224,15 @@ const ResumeUpload = () => {
         </div>
       ))}
 
-      {/* 텍스트 입력(선택) - 엔드포인트 전송 필드 */}
-      <div className="space-y-2">
-        <label className="text-sm font-medium">텍스트 입력(선택)</label>
-        <div className="grid gap-3 md:grid-cols-3">
-          <textarea
-            placeholder="이력서 요약 (resumeText)"
-            value={resumeText}
-            onChange={(e) => setResumeText(e.target.value)}
-            className="h-28 w-full rounded-md border border-gray-600 bg-[#1f1f1f] p-3 text-sm text-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-          <textarea
-            placeholder="자기소개 (selfIntroText)"
-            value={selfIntroText}
-            onChange={(e) => setSelfIntroText(e.target.value)}
-            className="h-28 w-full rounded-md border border-gray-600 bg-[#1f1f1f] p-3 text-sm text-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-          <textarea
-            placeholder="경력 기술 (careerDescText)"
-            value={careerDescText}
-            onChange={(e) => setCareerDescText(e.target.value)}
-            className="h-28 w-full rounded-md border border-gray-600 bg-[#1f1f1f] p-3 text-sm text-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
-        <p className="text-xs text-gray-400">
-          ※ 현재 API는 <b>이력서/자기소개/경력기술</b>의 PDF 파일 + 위 텍스트만 처리합니다. 포트폴리오/URL/스택은 별도 저장 대상입니다.
-        </p>
-      </div>
-
-      {/* 기술스택 입력 섹션 (기존 로직 유지) */}
+      {/* 기술스택 입력 섹션(표시/관리용, 전송X)
       <div>
         <label className="text-sm font-medium">
-          기술스택 <span className="text-red-500">*required</span>
+          기술스택 <span className="text-red-500">*optional</span>
         </label>
         <div className="flex space-x-2 mt-2">
           <input
-            placeholder="입력"
-            className="w-[200px] h-10 rounded-md border border-gray-600 bg-[#1f1f1f] px-3 py-2 text-sm text-gray-300
+            placeholder="입력 후 Enter 또는 버튼"
+            className="w-[220px] h-10 rounded-md border border-gray-600 bg-[#1f1f1f] px-3 py-2 text-sm text-gray-300
                        focus:outline-none focus:ring-2 focus:ring-blue-500"
             value={techStackInput}
             onChange={(e) => setTechStackInput(e.target.value)}
@@ -293,7 +269,10 @@ const ResumeUpload = () => {
             </div>
           ))}
         </div>
-      </div>
+        <p className="mt-1 text-xs text-gray-400">
+          * 현재 업로드 API로는 전송하지 않아요(표시/관리용). 필요 시 별도 엔드포인트로 연동 가능.
+        </p>
+      </div> */}
 
       {/* 액션 버튼 */}
       <div className="grid gap-3 md:grid-cols-2">

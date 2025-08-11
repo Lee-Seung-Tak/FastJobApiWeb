@@ -119,15 +119,15 @@ function App() {
         />
 
 
-        <Route
+        {/* <Route
           path="/company/home"
           element=
           {<CompanyHome isLoggedIn={false} setIsLoggedIn={function (_value: SetStateAction<boolean>): void {
             throw new Error('Function not implemented.');
-          }} />} />
+          }} />} /> */}
 
 
-        {/* 
+
         <Route
           path="/company/home"
           element={
@@ -141,7 +141,7 @@ function App() {
               <Navigate to="/" replace />
             )
           }
-        /> */}
+        />
 
         <Route path="/company/job-postings/new" element={<NewJobPosting />} />
         <Route path="/company/job-postings/:id/edit" element={<EditJobPosting />} />
