@@ -22,6 +22,7 @@ import UserHome from './pages/user/UserHome';
 // Company home
 import CompanyHome from './pages/company/CompanyHome';
 import NewJobPosting from './pages/company/resume/NewJobPosting';
+import EditJobPosting from './pages/company/resume/EditJobPosting';
 
 
 
@@ -143,6 +144,7 @@ function App() {
         /> */}
 
         <Route path="/company/job-postings/new" element={<NewJobPosting />} />
+        <Route path="/company/job-postings/:id/edit" element={<EditJobPosting />} />
 
       </Routes>
     </BrowserRouter >
